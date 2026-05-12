@@ -852,8 +852,7 @@ async function sendMessage(){
   const btn = document.getElementById('sendBtn'); btn.disabled=true;
   const lid = appendLoading();
   try{
-    const r = await fetch("https://lucky-frog-21cc.mahmoud3104.workers.dev/
-",{
+   const r = await fetch("https://lucky-frog-21cc.mahmoud3104.workers.dev/",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-api-key":"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"},
       body:JSON.stringify({
