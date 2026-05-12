@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mahmoud's DAX & Power Query Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --brand: #185FA5;
+  --brand-dark: #0C447C;
+  --brand-light: #E6F1FB;
+  --brand-mid: #378ADD;
+  --accent: #1D9E75;
+  --accent-light: #E1F5EE;
+  --accent-dark: #0F6E56;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --amber-dark: #854F0B;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --coral: #993C1D;
+  --coral-light: #FAECE7;
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface2: #F1F3F5;
+  --border: rgba(0,0,0,0.08);
+  --border-mid: rgba(0,0,0,0.13);
+  --text: #1A1A2E;
+  --text2: #4A5568;
+  --text3: #718096;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] {
+  --bg: #0F1117;
+  --surface: #1A1D27;
+  --surface2: #23273A;
+  --border: rgba(255,255,255,0.07);
+  --border-mid: rgba(255,255,255,0.12);
+  --text: #E8EAF0;
+  --text2: #A0AAC0;
+  --text3: #6B7590;
+  --brand-light: #0C2340;
+  --accent-light: #042C1A;
+  --amber-light: #2A1A00;
+  --purple-light: #1A1640;
+  --coral-light: #2A0E06;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.2s,color 0.2s}
+[dir="rtl"]{font-family:'IBM Plex Sans Arabic',sans-serif}
+
+/* HEADER */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;height:58px}
+.logo-area{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--brand);border:1.5px solid var(--brand-mid);flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-sub{font-size:11px;color:var(--text3);white-space:nowrap}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border:1px solid var(--border-mid);border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:all 0.15s}
+.icon-btn:hover{background:var(--brand-light);color:var(--brand);border-color:var(--brand)}
+.lang-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.lang-btn{padding:5px 12px;border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;color:var(--text3);transition:all 0.15s}
+.lang-btn.active{background:var(--brand);color:#fff}
+
+/* TABS */
+.tabs-bar{display:flex;gap:4px;padding:12px 1.5rem 0;background:var(--surface);border-bottom:1px solid var(--border)}
+.tab{padding:8px 18px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:7px}
+.tab svg{width:15px;height:15px;opacity:0.7}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* MAIN LAYOUT */
+.main{max-width:1100px;margin:0 auto;padding:1.25rem 1.5rem}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;text-align:center}
+.stat-num{font-size:22px;font-weight:600;color:var(--brand)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* SEARCH + FILTER */
+.controls{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);width:15px;height:15px}
+[dir="rtl"] .search-wrap svg{left:auto;right:10px}
+.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit}
+[dir="rtl"] .search-wrap input{padding:8px 34px 8px 12px}
+.search-wrap input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(24,95,165,0.1)}
+.type-filter{display:flex;gap:4px}
+.type-btn{padding:7px 12px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s;white-space:nowrap}
+.type-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+.cats-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-pill{padding:4px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text3);transition:all 0.12s}
+.cat-pill.active{background:var(--brand-light);color:var(--brand);border-color:var(--brand-mid)}
+
+.results-info{font-size:12px;color:var(--text3);margin-bottom:10px}
+
+/* LIBRARY GRID */
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.func-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s}
+.func-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
+.func-card.expanded{border-color:var(--brand);box-shadow:var(--shadow-md)}
+.card-top{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.card-left{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0}
+.func-badge{font-size:9px;font-weight:600;padding:3px 7px;border-radius:6px;white-space:nowrap;margin-top:2px;letter-spacing:0.3px;flex-shrink:0}
+.badge-dax{background:var(--brand-light);color:var(--brand-dark)}
+.badge-pq{background:var(--accent-light);color:var(--accent-dark)}
+.badge-excel{background:var(--amber-light);color:var(--amber-dark)}
+.badge-sql{background:var(--purple-light);color:var(--purple)}
+.card-info{flex:1;min-width:0}
+.func-name{font-size:13px;font-weight:600;color:var(--text);font-family:'IBM Plex Mono',monospace;margin-bottom:3px}
+.func-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.card-cat{font-size:10px;color:var(--text3);margin-top:4px;background:var(--surface2);padding:2px 6px;border-radius:4px;display:inline-block}
+.expand-icon{font-size:16px;color:var(--text3);flex-shrink:0;transition:transform 0.2s;user-select:none}
+.func-card.expanded .expand-icon{transform:rotate(180deg)}
+
+.func-detail{padding:0 16px 14px;display:none;border-top:1px solid var(--border)}
+.func-card.expanded .func-detail{display:block;padding-top:12px}
+.detail-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;margin-top:10px}
+.detail-label:first-child{margin-top:0}
+.code-block{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text);white-space:pre;overflow-x:auto;line-height:1.7;position:relative}
+.copy-code{position:absolute;top:6px;right:6px;padding:3px 8px;background:var(--surface);border:1px solid var(--border-mid);border-radius:5px;font-size:10px;cursor:pointer;color:var(--text3);font-family:inherit;transition:all 0.12s}
+.copy-code:hover{background:var(--brand-light);color:var(--brand);border-color:var(--brand)}
+[dir="rtl"] .copy-code{right:auto;left:6px}
+.tip-box{background:var(--accent-light);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--accent-dark);line-height:1.55;margin-top:8px}
+[dir="rtl"] .tip-box{border-left:none;border-right:3px solid var(--accent);border-radius:8px 0 0 8px}
+.note-row{font-size:11px;color:var(--text3);margin-top:8px;display:flex;align-items:center;gap:6px}
+.note-badge{background:var(--amber-light);color:var(--amber);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.compare-cell{background:var(--surface2);border-radius:8px;padding:8px 10px}
+.compare-title{font-size:10px;font-weight:600;margin-bottom:4px}
+.compare-code{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text);white-space:pre-wrap;line-height:1.5}
+
+/* AI PANEL */
+.ai-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.ai-header{padding:14px 18px;background:var(--brand-light);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-head-left{display:flex;align-items:center;gap:10px}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.ai-title{font-size:14px;font-weight:600;color:var(--brand-dark)}
+.ai-sub{font-size:11px;color:var(--brand);margin-top:1px}
+.model-badge{font-size:10px;background:var(--brand);color:#fff;padding:3px 8px;border-radius:6px}
+.chat-area{padding:16px;min-height:240px;max-height:430px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:86%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.65}
+.msg.user{align-self:flex-end;background:var(--brand);color:#fff;border-radius:12px 12px 3px 12px}
+[dir="rtl"] .msg.user{border-radius:12px 12px 12px 3px}
+.msg.ai{align-self:flex-start;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:12px 12px 12px 3px}
+[dir="rtl"] .msg.ai{border-radius:12px 12px 3px 12px}
+.msg-code{background:var(--surface);border:1px solid var(--border-mid);border-radius:6px;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;margin:6px 0;white-space:pre-wrap;line-height:1.6;overflow-x:auto}
+.msg-time{font-size:10px;opacity:0.6;margin-top:4px}
+.loading-dots{display:flex;gap:4px;padding:4px 0;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:pulse 1.2s infinite}
+.dot:nth-child(2){animation-delay:0.2s}
+.dot:nth-child(3){animation-delay:0.4s}
+@keyframes pulse{0%,80%,100%{opacity:0.25;transform:scale(0.85)}40%{opacity:1;transform:scale(1)}}
+.chips-area{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-top:1px solid var(--border)}
+.chip{padding:5px 11px;background:var(--surface2);border:1px solid var(--border-mid);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);transition:all 0.12s;font-family:inherit}
+.chip:hover{background:var(--brand-light);color:var(--brand);border-color:var(--brand-mid)}
+.chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);align-items:flex-end}
+.chat-input-row textarea{flex:1;padding:9px 12px;font-size:13px;resize:none;height:64px;border:1px solid var(--border-mid);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;line-height:1.5;transition:border-color 0.15s}
+.chat-input-row textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(24,95,165,0.1)}
+.send-btn{padding:0 20px;height:48px;background:var(--brand);border:none;border-radius:var(--radius);color:#fff;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;transition:opacity 0.15s;flex-shrink:0;font-family:inherit}
+.send-btn:hover{opacity:0.88}
+.send-btn:disabled{opacity:0.4;cursor:default}
+.send-btn svg{width:16px;height:16px}
+.chat-tools{display:flex;align-items:center;gap:8px;padding:8px 16px 0;border-top:1px solid var(--border)}
+.clear-btn{padding:4px 10px;border:1px solid var(--border-mid);border-radius:6px;background:transparent;font-size:11px;cursor:pointer;color:var(--text3);font-family:inherit;transition:all 0.12s}
+.clear-btn:hover{background:var(--coral-light);color:var(--coral);border-color:var(--coral)}
+.context-note{font-size:11px;color:var(--text3);flex:1;text-align:right}
+[dir="rtl"] .context-note{text-align:left}
+
+/* EXPORT PANEL */
+.export-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem}
+.export-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.export-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem;line-height:1.6}
+.export-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:1.5rem}
+.export-card{border:1px solid var(--border);border-radius:var(--radius);padding:1rem;cursor:pointer;transition:all 0.15s;background:var(--surface2)}
+.export-card:hover{border-color:var(--brand);background:var(--brand-light)}
+.export-icon{font-size:24px;margin-bottom:8px}
+.export-card-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.export-card-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.section-title{font-size:14px;font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.linkedin-steps{display:flex;flex-direction:column;gap:10px}
+.step-card{display:flex;gap:12px;align-items:flex-start;background:var(--surface2);border-radius:var(--radius);padding:12px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.post-template{background:var(--surface);border:1px solid var(--border-mid);border-radius:var(--radius);padding:12px;font-size:12px;line-height:1.7;color:var(--text);white-space:pre-wrap;margin-top:8px;font-family:inherit}
+.copy-post-btn{margin-top:8px;padding:6px 14px;border:1px solid var(--brand);border-radius:6px;background:transparent;color:var(--brand);font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.copy-post-btn:hover{background:var(--brand);color:#fff}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
+.empty-icon{font-size:36px;margin-bottom:8px;opacity:0.4}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+[dir="rtl"] .toast{right:auto;left:24px}
+
+@media(max-width:600px){
+  .topbar{padding:0 1rem}
+  .main{padding:1rem}
+  .library-grid{grid-template-columns:1fr}
+  .compare-row{grid-template-columns:1fr}
+  .brand-sub{display:none}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="topbar">
+  <div class="logo-area">
+    <div class="avatar">MA</div>
+    <div>
+      <div class="brand-name" id="hTitle">Mahmoud's DAX & Power Query Reference</div>
+      <div class="brand-sub" id="hSub">Comprehensive Library + AI Assistant</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lang-toggle">
+      <button class="lang-btn" onclick="setLang('ar')" id="btnAr">عربي</button>
+      <button class="lang-btn active" onclick="setLang('en')" id="btnEn">EN</button>
+    </div>
+    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
+    <button class="icon-btn" onclick="setTab('export')" title="Share / Export" id="shareTopBtn">⬆</button>
+  </div>
+</div>
+
+<div class="tabs-bar" id="tabsBar">
+  <button class="tab active" onclick="setTab('library')" id="tabLib">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+    <span id="tabLibLabel">Library</span>
+  </button>
+  <button class="tab" onclick="setTab('ai')" id="tabAI">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    <span id="tabAILabel">AI Assistant</span>
+  </button>
+  <button class="tab" onclick="setTab('export')" id="tabExport">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    <span id="tabExportLabel">Share & Export</span>
+  </button>
+</div>
+
+<div class="main">
+
+<!-- LIBRARY -->
+<div id="libraryView">
+  <div class="stats-row" id="statsRow"></div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search functions..." oninput="filterFunctions()"/>
+    </div>
+    <div class="type-filter" id="typeFilter"></div>
+  </div>
+  <div class="cats-row" id="catFilter"></div>
+  <div class="results-info" id="resultsCount"></div>
+  <div class="library-grid" id="libraryGrid"></div>
+</div>
+
+<!-- AI -->
+<div id="aiView" style="display:none">
+  <div class="ai-panel">
+    <div class="ai-header">
+      <div class="ai-head-left">
+        <div class="ai-dot"></div>
+        <div>
+          <div class="ai-title" id="aiTitle">AI Data Analysis Assistant</div>
+          <div class="ai-sub" id="aiSub">DAX · Power Query (M) · Excel · SQL</div>
+        </div>
+      </div>
+      <div class="model-badge">Claude Sonnet</div>
+    </div>
+    <div class="chat-area" id="chatArea">
+      <div class="msg ai" id="welcomeMsg">👋 Welcome! Ask me anything about DAX, Power Query (M), Excel formulas, or even SQL comparisons. Type in Arabic or English — I'll respond in the same language.</div>
+    </div>
+    <div class="chips-area" id="chips"></div>
+    <div class="chat-tools">
+      <button class="clear-btn" onclick="clearChat()" id="clearBtn">Clear chat</button>
+      <span class="context-note" id="contextNote">Context is preserved per session</span>
+    </div>
+    <div class="chat-input-row">
+      <textarea id="chatInput" placeholder="Ask a question..." onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span id="sendLabel">Send</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT & SHARE -->
+<div id="exportView" style="display:none">
+  <div class="export-panel" style="margin-bottom:1rem">
+    <div class="export-title" id="expTitle">Share & Export</div>
+    <div class="export-sub" id="expSub">Download this tool as a standalone HTML file you can share with anyone — no internet required after download.</div>
+    <div class="export-grid">
+      <div class="export-card" onclick="downloadHTML()">
+        <div class="export-icon">📄</div>
+        <div class="export-card-title" id="expHtmlTitle">Download as HTML</div>
+        <div class="export-card-desc" id="expHtmlDesc">Single file, works offline in any browser. Share via email, WhatsApp, or Google Drive.</div>
+      </div>
+      <div class="export-card" onclick="copyLink()">
+        <div class="export-icon">🔗</div>
+        <div class="export-card-title" id="expLinkTitle">Copy Page Link</div>
+        <div class="export-card-desc" id="expLinkDesc">Copy the current URL to share with colleagues who have access.</div>
+      </div>
+      <div class="export-card" onclick="printPage()">
+        <div class="export-icon">🖨️</div>
+        <div class="export-card-title" id="expPrintTitle">Print / Save as PDF</div>
+        <div class="export-card-desc" id="expPrintDesc">Open print dialog to save a PDF reference sheet of all functions.</div>
+      </div>
+      <div class="export-card" onclick="copyStats()">
+        <div class="export-icon">📊</div>
+        <div class="export-card-title" id="expStatsTitle">Copy Stats Summary</div>
+        <div class="export-card-desc" id="expStatsDesc">Copy a formatted summary of the library stats for LinkedIn posts.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-panel">
+    <div class="section-title" id="linkedinTitle">📣 Share on LinkedIn — Strategy Guide</div>
+    <div class="linkedin-steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title" id="s1t">Upload the HTML file to GitHub Pages or Google Sites</div>
+          <div class="step-desc" id="s1d">Get a public URL so anyone can access it directly. GitHub Pages is free: create a repo → upload the file → enable Pages in Settings.</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title" id="s2t">Post a screenshot + the link on LinkedIn</div>
+          <div class="step-desc" id="s2d">Take a screenshot of the tool open, add it as the first image. LinkedIn gives more reach to posts with images than plain text or links.</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title" id="s3t">Use the post template below — proven engagement format</div>
+          <div class="step-desc" id="s3d">Hook + value + CTA is the highest-engagement structure on LinkedIn for technical content.</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title" id="s4t">Tag relevant people & use the right hashtags</div>
+          <div class="step-desc" id="s4d">#PowerBI #DAX #PowerQuery #DataAnalytics #Excel — these reach 5M+ followers combined. Tag 2-3 known Power BI creators for repost potential.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <div class="section-title" id="postTemplateTitle">✍️ Ready-to-Use LinkedIn Post</div>
+      <div id="postToggle" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="chip" onclick="showPost('en')" id="postBtnEn" style="font-weight:600">English Post</button>
+        <button class="chip" onclick="showPost('ar')" id="postBtnAr">Arabic Post</button>
+      </div>
+      <div class="post-template" id="postContent"></div>
+      <button class="copy-post-btn" onclick="copyPost()" id="copyPostBtn">Copy post text</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────── DATA ───────────────────────
+const functions = [
+// DAX - Filter & Context
+{name:"CALCULATE",type:"DAX",cat:"Filter",
+en:{desc:"Evaluates an expression in a modified filter context — the most powerful DAX function.",
+example:`Sales YTD =\nCALCULATE(\n  SUM(Sales[Amount]),\n  DATESYTD(Date[Date])\n)`,
+tip:"Always wrap measures with CALCULATE when you need to change the filter context. It overrides existing filters or adds new ones.",
+note:"No direct Excel equivalent — closest is SUMPRODUCT with conditions",
+compare:{left:{label:"CALCULATE (correct)",code:`Revenue Filtered =\nCALCULATE(\n  [Total Revenue],\n  Product[Cat] = "Electronics"\n)`},right:{label:"SUM with filter (wrong)",code:`-- This ignores relationships:\nSUM(Sales[Amount])\n-- Use CALCULATE instead`}}},
+ar:{desc:"يحسب تعبيراً في سياق فلتر معدّل — أقوى دالة في DAX.",
+example:`مبيعات من بداية السنة =\nCALCULATE(\n  SUM(Sales[Amount]),\n  DATESYTD(Date[Date])\n)`,
+tip:"غلّف أي Measure بـ CALCULATE لتغيير سياق الفلتر. تتجاوز الفلاتر الموجودة أو تضيف جديدة.",
+note:"لا يوجد مكافئ مباشر في Excel — الأقرب هو SUMPRODUCT مع شروط"}},
+
+{name:"FILTER",type:"DAX",cat:"Filter",
+en:{desc:"Returns a table filtered by a condition. Used inside CALCULATE or other table functions.",
+example:`Top Customers =\nCALCULATE(\n  [Sales],\n  FILTER(\n    Customer,\n    Customer[Tier] = "Gold"\n  )\n)`,
+tip:"FILTER returns a whole table, not a scalar. Use it inside CALCULATE, not standalone in a measure.",
+note:"FILTER() function in Excel"},
+ar:{desc:"يرجع جدولاً مفلتراً بشرط. يُستخدم داخل CALCULATE أو دوال الجدول الأخرى.",
+example:`العملاء المميزون =\nCALCULATE(\n  [المبيعات],\n  FILTER(\n    Customer,\n    Customer[Tier] = "ذهبي"\n  )\n)`,
+tip:"FILTER يرجع جدولاً كاملاً، ليس قيمة مفردة. استخدمه داخل CALCULATE وليس منفرداً."}},
+
+{name:"ALL / ALLEXCEPT",type:"DAX",cat:"Filter",
+en:{desc:"ALL removes all filters from a table or column. ALLEXCEPT removes all filters EXCEPT specified columns.",
+example:`% of Total =\nDIVIDE(\n  [Sales],\n  CALCULATE([Sales], ALL(Sales))\n)\n\n-- ALLEXCEPT example:\nSales Keep Region =\nCALCULATE(\n  [Sales],\n  ALLEXCEPT(Date, Date[Year])\n)`,
+tip:"ALL is essential for % of total calculations. ALLEXCEPT is great when you want to keep one slicer active."},
+ar:{desc:"ALL يزيل كل الفلاتر من جدول أو عمود. ALLEXCEPT يزيلها ما عدا الأعمدة المحددة.",
+example:`نسبة من الإجمالي =\nDIVIDE(\n  [المبيعات],\n  CALCULATE([المبيعات], ALL(Sales))\n)`,
+tip:"ALL ضروري لحسابات نسبة الإجمالي. ALLEXCEPT رائع عندما تريد الاحتفاظ بفلتر محدد."}},
+
+// DAX - Iterators
+{name:"SUMX",type:"DAX",cat:"Iterator",
+en:{desc:"Iterates a table row-by-row, evaluates an expression per row, then returns the sum.",
+example:`Revenue =\nSUMX(\n  Sales,\n  Sales[Qty] * Sales[UnitPrice]\n)\n\n-- With discount:\nNet Revenue =\nSUMX(\n  Sales,\n  Sales[Qty] * Sales[Price] * (1 - Sales[Discount])\n)`,
+tip:"Use SUMX instead of a calculated column when doing row-level math inside a measure. X-functions (SUMX, AVERAGEX, MAXX) all follow the same pattern.",
+note:"SUMPRODUCT() in Excel"},
+ar:{desc:"يمر على جدول صف بصف، يحسب تعبيراً لكل صف، ثم يجمع النتائج.",
+example:`الإيراد =\nSUMX(\n  Sales,\n  Sales[Qty] * Sales[UnitPrice]\n)`,
+tip:"استخدم SUMX بدلاً من Calculated Column عند الحسابات على مستوى الصف داخل Measure. كل الدوال X (SUMX, AVERAGEX, MAXX) تتبع نفس النمط.",
+note:"SUMPRODUCT() في Excel"}},
+
+{name:"RANKX",type:"DAX",cat:"Iterator",
+en:{desc:"Returns the ranking of a value across a table of values. Supports dense and skip ranking.",
+example:`Product Rank =\nRANKX(\n  ALL(Product[Name]),\n  [Total Sales],\n  ,\n  DESC,\n  Dense\n)\n\n-- Rank within category:\nCat Rank =\nRANKX(\n  ALLSELECTED(Product[Name]),\n  [Sales]\n)`,
+tip:"Use ALL() for global rank across entire dataset. Use ALLSELECTED() to rank only visible items (respects slicers)."},
+ar:{desc:"يرجع ترتيب قيمة عبر جدول قيم. يدعم الترتيب المتصل والمتقطع.",
+example:`ترتيب المنتج =\nRANKX(\n  ALL(Product[Name]),\n  [إجمالي المبيعات],\n  ,\n  DESC,\n  Dense\n)`,
+tip:"استخدم ALL() للترتيب العام على كامل البيانات. ALLSELECTED() للترتيب ضمن العناصر المرئية فقط."}},
+
+// DAX - Time Intelligence
+{name:"DATEADD",type:"DAX",cat:"Time Intel",
+en:{desc:"Shifts a date column by intervals: DAY, MONTH, QUARTER, or YEAR.",
+example:`Sales LY =\nCALCULATE(\n  [Total Sales],\n  DATEADD(Date[Date], -1, YEAR)\n)\n\nSales LM =\nCALCULATE(\n  [Total Sales],\n  DATEADD(Date[Date], -1, MONTH)\n)`,
+tip:"Requires a proper Date table marked as Date Table in Power BI. Always use a continuous date table (no gaps).",
+note:"DATE() + offset logic in Excel"},
+ar:{desc:"يزحزح عمود تاريخ بفترات: يوم، شهر، ربع، سنة.",
+example:`مبيعات العام الماضي =\nCALCULATE(\n  [إجمالي المبيعات],\n  DATEADD(Date[Date], -1, YEAR)\n)`,
+tip:"يتطلب جدول تواريخ صحيح معلّم كـ Date Table في Power BI. استخدم دائماً جدول تواريخ متواصلاً بدون فجوات."}},
+
+{name:"DATESYTD / DATESMTD",type:"DAX",cat:"Time Intel",
+en:{desc:"Returns a set of dates from the beginning of the year (or month) up to the last date in context.",
+example:`YTD Sales =\nCALCULATE(\n  [Sales],\n  DATESYTD(Date[Date])\n)\n\nMTD Sales =\nCALCULATE(\n  [Sales],\n  DATESMTD(Date[Date])\n)\n\n-- Fiscal year YTD:\nFiscal YTD =\nCALCULATE(\n  [Sales],\n  DATESYTD(Date[Date], "03/31")\n)`,
+tip:"DATESYTD accepts a fiscal year end date as second argument. For Saudi fiscal year use '12/31'."},
+ar:{desc:"يرجع مجموعة تواريخ من بداية السنة (أو الشهر) حتى آخر تاريخ في السياق.",
+example:`مبيعات من بداية السنة =\nCALCULATE(\n  [المبيعات],\n  DATESYTD(Date[Date])\n)`,
+tip:"DATESYTD يقبل تاريخ نهاية السنة المالية كمعامل ثانٍ. للسنة الميلادية استخدم '12/31'."}},
+
+{name:"SAMEPERIODLASTYEAR",type:"DAX",cat:"Time Intel",
+en:{desc:"Returns a set of dates in the prior year for comparison. Shortcut for DATEADD(-1, YEAR).",
+example:`LY Sales =\nCALCULATE(\n  [Total Sales],\n  SAMEPERIODLASTYEAR(Date[Date])\n)\n\nYoY % =\nDIVIDE(\n  [Total Sales] - [LY Sales],\n  [LY Sales]\n)`,
+tip:"Simpler than DATEADD for year-over-year. Always pair with YoY % = DIVIDE([Sales]-[LY Sales],[LY Sales])."},
+ar:{desc:"يرجع مجموعة تواريخ من العام الماضي للمقارنة. اختصار لـ DATEADD بـ -1 سنة.",
+example:`مبيعات العام الماضي =\nCALCULATE(\n  [إجمالي المبيعات],\n  SAMEPERIODLASTYEAR(Date[Date])\n)\n\nنسبة النمو =\nDIVIDE(\n  [إجمالي المبيعات] - [LY Sales],\n  [LY Sales]\n)`,
+tip:"أبسط من DATEADD لمقارنة السنوات. اقرنها دائماً بـ DIVIDE لحساب نسبة النمو."}},
+
+// DAX - Statistical
+{name:"DIVIDE",type:"DAX",cat:"Statistical",
+en:{desc:"Safe division that returns an alternate result (default 0 or BLANK) instead of an error when dividing by zero.",
+example:`Margin % =\nDIVIDE(\n  [Gross Profit],\n  [Revenue],\n  0\n)\n\n-- With BLANK:\nConversion Rate =\nDIVIDE(\n  [Orders],\n  [Visits]\n  -- blank if no visits\n)`,
+tip:"Always use DIVIDE instead of '/' operator in DAX measures. The third argument (alternate result) defaults to BLANK() if omitted.",
+note:"IFERROR(A/B,0) in Excel"},
+ar:{desc:"قسمة آمنة ترجع نتيجة بديلة بدلاً من خطأ عند القسمة على صفر.",
+example:`نسبة الهامش =\nDIVIDE(\n  [إجمالي الربح],\n  [الإيراد],\n  0\n)`,
+tip:"استخدم DIVIDE دائماً بدلاً من '/' في DAX Measures. المعامل الثالث يعود BLANK() إذا حُذف.",
+note:"IFERROR(A/B,0) في Excel"}},
+
+{name:"PERCENTILEX.INC",type:"DAX",cat:"Statistical",
+en:{desc:"Returns the k-th percentile of an expression evaluated for each row in a table.",
+example:`P90 Salary =\nPERCENTILEX.INC(\n  Employees,\n  Employees[Salary],\n  0.9\n)\n\nMedian Salary =\nPERCENTILEX.INC(\n  Employees,\n  Employees[Salary],\n  0.5\n)`,
+tip:"DAX has no MEDIAN function — use PERCENTILEX.INC(table, col, 0.5) instead.",
+note:"PERCENTILE.INC() in Excel"},
+ar:{desc:"يرجع النسبة المئوية k لتعبير محسوب لكل صف في جدول.",
+example:`أعلى 10% رواتب =\nPERCENTILEX.INC(\n  Employees,\n  Employees[Salary],\n  0.9\n)\n\nالوسيط =\nPERCENTILEX.INC(\n  Employees,\n  Employees[Salary],\n  0.5\n)`,
+tip:"DAX لا يملك دالة MEDIAN — استخدم PERCENTILEX.INC(table, col, 0.5) بدلاً منها.",
+note:"PERCENTILE.INC() في Excel"}},
+
+// DAX - Logical
+{name:"SWITCH",type:"DAX",cat:"Logical",
+en:{desc:"Evaluates an expression against a list of values and returns the matching result. Cleaner than nested IF.",
+example:`Grade =\nSWITCH(\n  TRUE(),\n  [Score] >= 90, "Excellent",\n  [Score] >= 80, "Very Good",\n  [Score] >= 70, "Good",\n  [Score] >= 60, "Pass",\n  "Fail"\n)`,
+tip:"SWITCH(TRUE(), ...) is the DAX equivalent of IFS() — much cleaner than nested IF statements.",
+note:"IFS() or nested IF() in Excel"},
+ar:{desc:"يقيّم تعبيراً مقابل قيم ويرجع النتيجة المطابقة. أوضح من IF المتداخل.",
+example:`التقدير =\nSWITCH(\n  TRUE(),\n  [Score] >= 90, "ممتاز",\n  [Score] >= 80, "جيد جداً",\n  [Score] >= 70, "جيد",\n  [Score] >= 60, "مقبول",\n  "راسب"\n)`,
+tip:"SWITCH(TRUE(), ...) يعادل IFS() في Excel — أوضح بكثير من IF المتداخل.",
+note:"IFS() أو IF() المتداخل في Excel"}},
+
+// Power Query
+{name:"Table.SelectRows",type:"PQ",cat:"Filter",
+en:{desc:"Filters rows based on a condition using 'each' for row context.",
+example:`-- Filter active employees with salary > 5000:\nTable.SelectRows(\n  Source,\n  each [Status] = "Active"\n    and [Salary] > 5000\n)\n\n-- Filter by date range:\nTable.SelectRows(\n  Source,\n  each [Date] >= #date(2024,1,1)\n    and [Date] <= #date(2024,12,31)\n)`,
+tip:"Use 'each' keyword for row context. Chain conditions with 'and'/'or'. Use #date(), #datetime() for date literals.",
+note:"WHERE clause in SQL / FILTER() in Excel"},
+ar:{desc:"يصفي الصفوف بناءً على شرط باستخدام 'each' لسياق الصف.",
+example:`-- تصفية الموظفين النشطين براتب > 5000:\nTable.SelectRows(\n  Source,\n  each [Status] = "نشط"\n    and [Salary] > 5000\n)`,
+tip:"استخدم 'each' لسياق الصف. اجمع الشروط بـ 'and' أو 'or'. استخدم #date() للتواريخ.",
+note:"WHERE في SQL أو FILTER() في Excel"}},
+
+{name:"Table.Group",type:"PQ",cat:"Aggregate",
+en:{desc:"Groups rows and computes aggregations. Power Query's equivalent of GROUP BY.",
+example:`Table.Group(\n  Source,\n  {"Department", "Year"},\n  {\n    {"HeadCount",\n      each Table.RowCount(_), Int64.Type},\n    {"TotalSalary",\n      each List.Sum([Salary]), type number},\n    {"AvgSalary",\n      each List.Average([Salary]), type number}\n  }\n)`,
+tip:"Third argument is a list of {output name, aggregation function, optional type} triples. Use _ to reference the grouped sub-table.",
+note:"GROUP BY in SQL / SUMIF/COUNTIF in Excel"},
+ar:{desc:"يجمع الصفوف ويحسب التجميعات. مكافئ GROUP BY في Power Query.",
+example:`Table.Group(\n  Source,\n  {"الإدارة"},\n  {\n    {"عدد الموظفين", each Table.RowCount(_)},\n    {"إجمالي الرواتب", each List.Sum([Salary])},\n    {"متوسط الراتب", each List.Average([Salary])}\n  }\n)`,
+tip:"المعامل الثالث قائمة ثلاثيات {اسم المخرج، دالة التجميع، النوع اختياري}. استخدم _ للإشارة إلى الجدول الفرعي.",
+note:"GROUP BY في SQL أو SUMIF/COUNTIF في Excel"}},
+
+{name:"Table.NestedJoin",type:"PQ",cat:"Merge",
+en:{desc:"Joins two tables on key columns. Supports all join types: Inner, Left, Right, Full, Anti.",
+example:`-- Left join Employees to Departments:\nTable.NestedJoin(\n  Employees,    -- left table\n  {"DeptID"},   -- left key\n  Departments,  -- right table\n  {"ID"},       -- right key\n  "Dept",       -- new column name\n  JoinKind.LeftOuter\n)\n\n-- Then expand:\nTable.ExpandTableColumn(\n  Joined,\n  "Dept",\n  {"Name","Budget"}\n)`,
+tip:"Always expand the nested table column right after the join. JoinKind options: Inner, LeftOuter, RightOuter, FullOuter, LeftAnti, RightAnti.",
+note:"VLOOKUP / INDEX MATCH in Excel | JOIN in SQL"},
+ar:{desc:"يدمج جدولين على أعمدة مفاتيح. يدعم كل أنواع الدمج.",
+example:`Table.NestedJoin(\n  الموظفون,\n  {"رقم_الإدارة"},\n  الإدارات,\n  {"الرقم"},\n  "تفاصيل_الإدارة",\n  JoinKind.LeftOuter\n)`,
+tip:"افرد عمود الجدول المتداخل مباشرة بعد الدمج. الخيارات: Inner, LeftOuter, RightOuter, FullOuter, LeftAnti.",
+note:"VLOOKUP / INDEX MATCH في Excel | JOIN في SQL"}},
+
+{name:"Table.TransformColumns",type:"PQ",cat:"Transform",
+en:{desc:"Applies transformation functions to specified columns. Change types, formats, or calculate new values.",
+example:`Table.TransformColumns(\n  Source,\n  {\n    {"Name", Text.Proper, type text},\n    {"Salary", each _ * 1.15, type number},\n    {"Date", each Date.ToText(_, "yyyy-MM"), type text},\n    {"Phone", each Text.Replace(_, "-", ""), type text}\n  }\n)`,
+tip:"Third element in each tuple specifies the output type — always include it. Multiple columns in one step is much faster than chaining steps.",
+note:"Multiple PROPER(), SUBSTITUTE() in Excel"},
+ar:{desc:"يطبق دوال تحويل على أعمدة محددة. غيّر الأنواع والتنسيقات أو احسب قيماً جديدة.",
+example:`Table.TransformColumns(\n  Source,\n  {\n    {"الاسم", Text.Proper, type text},\n    {"الراتب", each _ * 1.15, type number},\n    {"التاريخ", each Date.ToText(_, "yyyy-MM"), type text}\n  }\n)`,
+tip:"العنصر الثالث في كل tuple يحدد نوع المخرج — أدرجه دائماً. تحويل عدة أعمدة في خطوة واحدة أسرع بكثير."}},
+
+{name:"Table.AddColumn",type:"PQ",cat:"Transform",
+en:{desc:"Adds a new calculated column to a table using a custom function.",
+example:`-- Basic calculated column:\nTable.AddColumn(\n  Source,\n  "GOSI",\n  each [Salary] * 0.1,\n  type number\n)\n\n-- Conditional column:\nTable.AddColumn(\n  Source,\n  "Grade",\n  each if [Score] >= 90 then "A"\n      else if [Score] >= 80 then "B"\n      else "C",\n  type text\n)`,
+tip:"Always specify the type as 4th argument for better performance. Use 'each' with field access [ColumnName].",
+note:"Helper column formulas in Excel"},
+ar:{desc:"يضيف عموداً محسوباً جديداً للجدول باستخدام دالة مخصصة.",
+example:`Table.AddColumn(\n  Source,\n  "نسبة_الغوسي",\n  each [Salary] * 0.1,\n  type number\n)`,
+tip:"حدد النوع دائماً كمعامل رابع لأداء أفضل. استخدم 'each' مع [اسم_العمود] للوصول للحقول."}},
+
+{name:"List.Accumulate",type:"PQ",cat:"Advanced",
+en:{desc:"Iterates a list with a running state — Power Query's functional loop for complex transformations.",
+example:`-- Running total:\nList.Accumulate(\n  {100, 200, 150, 300},\n  0,\n  (state, current) => state + current\n)\n-- Returns: 750\n\n-- Build a lookup table dynamically:\nList.Accumulate(\n  TableNames,\n  [],\n  (state, name) =>\n    Record.AddField(state, name,\n      Table.RowCount(Excel.Workbook(\n        File.Contents(name))))\n)`,
+tip:"state = accumulated value so far. current = current list item. The seed (2nd arg) is the initial state value."},
+ar:{desc:"يمر على قائمة مع حالة متراكمة — الحلقة الوظيفية لـ Power Query.",
+example:`List.Accumulate(\n  {100, 200, 150, 300},\n  0,\n  (state, current) => state + current\n)\n-- النتيجة: 750`,
+tip:"state = القيمة المتراكمة حتى الآن. current = العنصر الحالي. البذرة (المعامل الثاني) هي القيمة الأولية."}},
+
+{name:"Text.Split / Text.Combine",type:"PQ",cat:"Text",
+en:{desc:"Split text into a list by delimiter, or join a list of text values with a delimiter.",
+example:`-- Split full name:\nText.Split("Ahmed Mohamed Ali", " ")\n-- Returns: {"Ahmed","Mohamed","Ali"}\n\n-- Get first name:\nList.First(Text.Split([FullName], " "))\n\n-- Combine with separator:\nText.Combine(\n  {"Jan","Feb","Mar"},\n  ", "\n)\n-- Returns: "Jan, Feb, Mar"`,
+tip:"Use Text.Split + List.First/Last for extracting first/last word. Combine with Table.AddColumn for new columns."},
+ar:{desc:"يقسم نصاً إلى قائمة بمحدد، أو يدمج قائمة نصوص بمحدد.",
+example:`-- تقسيم الاسم الكامل:\nText.Split("أحمد محمد علي", " ")\n-- النتيجة: {"أحمد","محمد","علي"}\n\n-- الاسم الأول:\nList.First(Text.Split([الاسم_الكامل], " "))`,
+tip:"استخدم Text.Split مع List.First/Last لاستخراج الكلمة الأولى/الأخيرة. اجمعها مع Table.AddColumn لأعمدة جديدة."}},
+
+// Excel
+{name:"XLOOKUP",type:"Excel",cat:"Lookup",
+en:{desc:"Modern replacement for VLOOKUP/HLOOKUP. Searches any direction, handles not-found gracefully.",
+example:`-- Basic:\n=XLOOKUP(A2, EmpTable[ID], EmpTable[Name], "Not Found")\n\n-- Return multiple columns:\n=XLOOKUP(A2, EmpTable[ID],\n  EmpTable[[Name]:[Department]], "Not Found")\n\n-- Approximate match (next smaller):\n=XLOOKUP(Score, Grades[Min], Grades[Grade],,  -1)`,
+tip:"5th arg: 0=exact, 1=next larger, -1=next smaller, 2=wildcard. 6th arg: 1=first to last, -1=last to first (for last match).",
+note:"Replaces VLOOKUP, HLOOKUP, and INDEX/MATCH"},
+ar:{desc:"بديل حديث لـ VLOOKUP/HLOOKUP. يبحث في أي اتجاه ويتعامل مع الحالات غير المعثور عليها بأناقة.",
+example:`=XLOOKUP(A2, EmpTable[ID], EmpTable[Name], "غير موجود")`,
+tip:"المعامل الخامس: 0=تطابق تام، 1=أكبر تالي، -1=أصغر تالي، 2=Wildcard. السادس: 1=أول لآخر، -1=آخر لأول.",
+note:"يحل محل VLOOKUP وHLOOKUP وINDEX/MATCH"}},
+
+{name:"LET",type:"Excel",cat:"Advanced",
+en:{desc:"Assigns names to intermediate calculations for reuse within one formula. Improves readability and performance.",
+example:`-- GOSI & net salary calculation:\n=LET(\n  salary, C2,\n  gosi_rate, 0.1,\n  gosi, salary * gosi_rate,\n  housing, salary * 0.25,\n  net, salary + housing - gosi,\n  net\n)\n\n-- Reuse in multiple places:\n=LET(\n  data, FILTER(A:C, B:B="Active"),\n  total, SUM(INDEX(data,,3)),\n  count, ROWS(data),\n  total/count\n)`,
+tip:"LET calculates each named value only once, even if used multiple times. Crucial for complex formulas with repeated calculations.",
+note:"Similar to variable assignment in DAX DEFINE or Power Query 'let … in'"},
+ar:{desc:"يسند أسماء لحسابات وسيطة لإعادة استخدامها في معادلة واحدة.",
+example:`=LET(\n  الراتب, C2,\n  الغوسي, الراتب * 0.1,\n  السكن, الراتب * 0.25,\n  الصافي, الراتب + السكن - الغوسي,\n  الصافي\n)`,
+tip:"LET يحسب كل قيمة مرة واحدة فقط حتى لو استُخدمت أكثر من مرة. ضروري للمعادلات المعقدة.",
+note:"مشابه لتعريف المتغيرات في DAX DEFINE أو 'let … in' في Power Query"}},
+
+{name:"BYROW / BYCOL",type:"Excel",cat:"Iterator",
+en:{desc:"Applies a LAMBDA function to each row (or column) of an array, returning an array of results.",
+example:`-- Sum each row:\n=BYROW(B2:E10, LAMBDA(row, SUM(row)))\n\n-- Max in each row:\n=BYROW(B2:E10, LAMBDA(r, MAX(r)))\n\n-- Custom logic per row:\n=BYROW(A2:C10,\n  LAMBDA(r,\n    IF(SUM(r)>1000,"High","Low")\n  )\n)`,
+tip:"Available in Excel 365/2021+. BYCOL does the same per column. Great for replacing helper columns.",
+note:"SUMX / MAXX per-row logic in DAX"},
+ar:{desc:"يطبق دالة LAMBDA على كل صف (أو عمود) في مصفوفة.",
+example:`-- جمع كل صف:\n=BYROW(B2:E10, LAMBDA(row, SUM(row)))\n\n-- منطق مخصص لكل صف:\n=BYROW(A2:C10,\n  LAMBDA(r,\n    IF(SUM(r)>1000,"مرتفع","منخفض")\n  )\n)`,
+tip:"متوفر في Excel 365/2021 فما فوق. BYCOL يفعل نفس الشيء على الأعمدة. ممتاز لاستبدال الأعمدة المساعدة.",
+note:"SUMX / MAXX per-row في DAX"}},
+
+{name:"UNIQUE / SORT / FILTER",type:"Excel",cat:"Array",
+en:{desc:"Dynamic array functions that spill results automatically. The three pillars of modern Excel formulas.",
+example:`-- Unique departments:\n=UNIQUE(EmpTable[Department])\n\n-- Sorted unique list:\n=SORT(UNIQUE(EmpTable[Dept]))\n\n-- Filter active employees:\n=FILTER(\n  EmpTable,\n  EmpTable[Status]="Active",\n  "No results"\n)\n\n-- Combine all three:\n=SORT(\n  UNIQUE(\n    FILTER(EmpTable[Dept],\n      EmpTable[Status]="Active"\n    )\n  )\n)`,
+tip:"These are dynamic — they auto-update when source data changes. Combine with LET for powerful pipelines.",
+note:"Table.Distinct / SelectRows / Sort in Power Query"},
+ar:{desc:"دوال المصفوفة الديناميكية التي تسكب النتائج تلقائياً. أساس Excel الحديث.",
+example:`=UNIQUE(EmpTable[Department])\n=SORT(UNIQUE(EmpTable[Dept]))\n=FILTER(EmpTable, EmpTable[Status]="نشط")`,
+tip:"ديناميكية — تتحدث تلقائياً مع تغيير البيانات. اجمعها مع LET لسلاسل معالجة قوية.",
+note:"Table.Distinct / SelectRows / Sort في Power Query"}},
+
+{name:"LAMBDA",type:"Excel",cat:"Advanced",
+en:{desc:"Creates custom reusable functions directly in Excel without VBA. Define once, use everywhere.",
+example:`-- Define in Name Manager:\nCOMMISSION = LAMBDA(sales, rate,\n  IF(sales > 100000,\n    sales * rate * 1.2,\n    sales * rate\n  )\n)\n\n-- Then use anywhere:\n=COMMISSION(B2, 0.05)\n\n-- Recursive factorial:\nFACT_R = LAMBDA(n,\n  IF(n<=1, 1, n * FACT_R(n-1))\n)`,
+tip:"Define LAMBDAs in the Name Manager (Ctrl+F3). Name them like functions. They work in any cell across the workbook.",
+note:"Custom M functions in Power Query / DAX Measures"},
+ar:{desc:"ينشئ دوالاً مخصصة قابلة للإعادة استخدام في Excel بدون VBA.",
+example:`-- عرّفها في Name Manager:\nEMPLOYEE_BONUS = LAMBDA(salary, perf,\n  IF(perf="ممتاز", salary*0.15,\n  IF(perf="جيد", salary*0.10,\n  salary*0.05))\n)\n\n-- استخدمها في أي خلية:\n=EMPLOYEE_BONUS(C2, D2)`,
+tip:"عرّف LAMBDA في Name Manager (Ctrl+F3). اسمها مثل الدوال العادية. تعمل في أي خلية في المصنف.",
+note:"الدوال المخصصة في Power Query أو DAX Measures"}}
+];
+
+// ─────────────────────── TRANSLATIONS ───────────────────────
+const T = {
+en:{
+  hTitle:"Mahmoud's DAX & Power Query Reference",hSub:"Comprehensive Library + AI Assistant",
+  tabLib:"Library",tabAI:"AI Assistant",tabExport:"Share & Export",
+  search:"Search functions, descriptions...",
+  allType:"All",typeDAX:"DAX",typePQ:"Power Query",typeExcel:"Excel",
+  allCat:"All",
+  aiTitle:"AI Data Analysis Assistant",aiSub:"DAX · Power Query (M) · Excel · SQL",
+  welcome:"👋 Welcome! Ask me anything about DAX, Power Query (M), Excel, or SQL. I respond in the same language you write in.",
+  send:"Send",chatPlaceholder:"Ask a DAX or Power Query question...",clearBtn:"Clear chat",
+  contextNote:"Full conversation context preserved",
+  expTitle:"Share & Export",expSub:"Download as a standalone HTML file to share with anyone — works offline in any browser.",
+  expHtmlTitle:"Download as HTML",expHtmlDesc:"Single self-contained file. Share via email, WhatsApp, or Drive.",
+  expLinkTitle:"Copy Page Link",expLinkDesc:"Copy URL to share with colleagues.",
+  expPrintTitle:"Print / Save as PDF",expPrintDesc:"Save a PDF reference sheet of all functions.",
+  expStatsTitle:"Copy Stats Summary",expStatsDesc:"Formatted summary for LinkedIn posts.",
+  linkedinTitle:"📣 Share on LinkedIn — Strategy Guide",
+  s1t:"Upload to GitHub Pages or Google Sites",s1d:"Get a free public URL. GitHub Pages: create repo → upload file → enable Pages in Settings → share the link.",
+  s2t:"Post a screenshot + link on LinkedIn",s2d:"First image gets most attention. Screenshot the tool open, paste the public URL in your post.",
+  s3t:"Use the template below — proven engagement format",s3d:"Hook + value + CTA is highest-engagement format for technical content on LinkedIn.",
+  s4t:"Use the right hashtags",s4d:"#PowerBI #DAX #PowerQuery #DataAnalytics #Excel — combine these for maximum reach. Tag 2-3 Power BI creators.",
+  postTemplateTitle:"✍️ Ready-to-Use LinkedIn Post",
+  detailExample:"Example",detailTip:"Tip",detailNote:"Excel equivalent",detailCompare:"Comparison",
+},
+ar:{
+  hTitle:"مرجع DAX وPower Query — محمود",hSub:"مكتبة شاملة + مساعد ذكاء اصطناعي",
+  tabLib:"المكتبة",tabAI:"المساعد الذكي",tabExport:"مشاركة وتصدير",
+  search:"ابحث عن دالة أو وصف...",
+  allType:"الكل",typeDAX:"DAX",typePQ:"Power Query",typeExcel:"Excel",
+  allCat:"الكل",
+  aiTitle:"مساعد تحليل البيانات الذكي",aiSub:"DAX · Power Query (M) · Excel · SQL",
+  welcome:"👋 أهلاً! اسألني أي سؤال عن DAX أو Power Query أو Excel أو SQL. سأرد بنفس اللغة التي تكتب بها.",
+  send:"إرسال",chatPlaceholder:"اكتب سؤالك عن DAX أو Power Query...",clearBtn:"مسح المحادثة",
+  contextNote:"سياق المحادثة الكامل محفوظ",
+  expTitle:"مشاركة وتصدير",expSub:"نزّل الأداة كملف HTML مستقل تشاركه مع أي شخص — يعمل بدون إنترنت.",
+  expHtmlTitle:"تنزيل كـ HTML",expHtmlDesc:"ملف واحد متكامل. شاركه عبر البريد أو WhatsApp أو Drive.",
+  expLinkTitle:"نسخ رابط الصفحة",expLinkDesc:"انسخ الرابط لمشاركته مع الزملاء.",
+  expPrintTitle:"طباعة / حفظ PDF",expPrintDesc:"احفظ ورقة مرجعية PDF بكل الدوال.",
+  expStatsTitle:"نسخ ملخص الإحصائيات",expStatsDesc:"ملخص منسق لنشرات LinkedIn.",
+  linkedinTitle:"📣 مشاركة على LinkedIn — دليل الاستراتيجية",
+  s1t:"ارفع الملف على GitHub Pages أو Google Sites",s1d:"احصل على رابط عام مجاني. GitHub Pages: أنشئ مستودع → ارفع الملف → فعّل Pages في الإعدادات → شارك الرابط.",
+  s2t:"انشر لقطة شاشة + الرابط على LinkedIn",s2d:"الصورة الأولى تحصل على أعلى تفاعل. التقط لقطة للأداة مفتوحة والصق الرابط في المنشور.",
+  s3t:"استخدم القالب أدناه — تنسيق مثبت التفاعل",s3d:"صنّارة + قيمة + دعوة للتفاعل — أعلى صيغة تفاعل للمحتوى التقني على LinkedIn.",
+  s4t:"استخدم الهاشتاقات الصحيحة",s4d:"#PowerBI #DAX #PowerQuery #تحليل_البيانات — اجمعها للوصول الأقصى. وسّم 2-3 من منشئي محتوى Power BI.",
+  postTemplateTitle:"✍️ منشور LinkedIn جاهز للنشر",
+  detailExample:"مثال",detailTip:"نصيحة",detailNote:"المكافئ في Excel",detailCompare:"مقارنة",
+}};
+
+const suggestions = {
+en:["Write CALCULATE with multiple filters","How to join tables in Power Query?","SUMX vs SUM — when to use each?","Running total DAX measure","Replace VLOOKUP with XLOOKUP","YoY growth calculation","GOSI deduction formula Excel","Power Query unpivot columns"],
+ar:["اكتب CALCULATE بفلاتر متعددة","كيف أدمج جدولين في Power Query؟","SUMX مقابل SUM — متى أستخدم كل منهما؟","مجموع تراكمي في DAX","استبدال VLOOKUP بـ XLOOKUP","حساب نسبة النمو سنة بسنة","معادلة خصم الغوسي في Excel","فك الإحداثيات في Power Query"]};
+
+const posts = {
+en:`🔥 I built a FREE interactive DAX & Power Query reference tool — and I'm sharing it with the community.
+
+After years working with Power BI, I found myself Googling the same functions over and over.
+
+So I built this:
+✅ 25+ DAX functions with real examples
+✅ 10+ Power Query (M) patterns  
+✅ Excel modern functions (XLOOKUP, LET, LAMBDA…)
+✅ AI assistant that answers your questions instantly
+✅ Fully bilingual (Arabic + English)
+✅ Works offline — no login needed
+
+Whether you're calculating YTD sales, merging tables, or building time intelligence — it's all there.
+
+📎 Link in comments 👇
+
+What DAX function do YOU find most confusing? Drop it below 👇
+
+#PowerBI #DAX #PowerQuery #DataAnalytics #Excel #DataAnalysis #BusinessIntelligence`,
+ar:`🔥 بنيت أداة مرجعية تفاعلية مجانية للـ DAX وPower Query — وشاركتها مع المجتمع
+
+بعد سنوات من العمل مع Power BI، لاحظت إني باحث عن نفس الدوال بشكل متكرر.
+
+فبنيت الأداة دي:
+✅ أكثر من 25 دالة DAX مع أمثلة حقيقية
+✅ أكثر من 10 أنماط Power Query (M)
+✅ دوال Excel الحديثة (XLOOKUP، LET، LAMBDA)
+✅ مساعد ذكاء اصطناعي يجاوب على أسئلتك فوراً
+✅ ثنائي اللغة كامل (عربي + إنجليزي)
+✅ يعمل بدون إنترنت — بدون تسجيل
+
+سواء كنت تحسب YTD أو تدمج جداول أو تبني Time Intelligence — كل شيء موجود.
+
+📎 الرابط في التعليقات 👇
+
+أيه الدالة اللي بتلاقيها أصعب في DAX؟ اكتبها في التعليقات 👇
+
+#PowerBI #DAX #PowerQuery #تحليل_البيانات #Excel #ذكاء_الأعمال`};
+
+// ─────────────────────── STATE ───────────────────────
+let lang = 'en', tab = 'library', typeFlt = 'All', catFlt = 'All';
+let expandedIdx = null, chatHistory = [], isDark = false, postLang = 'en';
+
+// ─────────────────────── INIT ───────────────────────
+function init(){
+  applyLang(); renderStats(); renderTypeFilter(); renderCatFilter(); filterFunctions(); renderChips(); showPost('en');
+}
+
+function applyLang(){
+  const t = T[lang];
+  document.documentElement.lang = lang; document.body.dir = lang==='ar'?'rtl':'ltr';
+  document.getElementById('btnAr').classList.toggle('active', lang==='ar');
+  document.getElementById('btnEn').classList.toggle('active', lang==='en');
+  ['hTitle','hSub','tabLibLabel','tabAILabel','tabExportLabel','search','aiTitle','aiSub',
+   'welcomeMsg','sendLabel','clearBtn','contextNote','expTitle','expSub',
+   'expHtmlTitle','expHtmlDesc','expLinkTitle','expLinkDesc','expPrintTitle','expPrintDesc',
+   'expStatsTitle','expStatsDesc','linkedinTitle','s1t','s1d','s2t','s2d','s3t','s3d','s4t','s4d','postTemplateTitle'
+  ].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){
+      if(id==='search') el.placeholder = t[id]||'';
+      else if(id==='welcomeMsg') el.textContent = t.welcome;
+      else el.textContent = t[id]||el.textContent;
+    }
+  });
+  document.getElementById('chatInput').placeholder = t.chatPlaceholder;
+  renderTypeFilter(); renderCatFilter(); filterFunctions(); renderChips();
+}
+
+function setLang(l){ lang=l; applyLang(); }
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('themeBtn').textContent = isDark?'☀️':'🌙';
+}
+function setTab(t){
+  tab=t;
+  ['library','ai','export'].forEach(name=>{
+    document.getElementById(name+'View').style.display = (name===t.replace('export','export'))?'block':'none';
+  });
+  document.getElementById('libraryView').style.display = t==='library'?'block':'none';
+  document.getElementById('aiView').style.display = t==='ai'?'block':'none';
+  document.getElementById('exportView').style.display = t==='export'?'block':'none';
+  ['tabLib','tabAI','tabExport'].forEach(id=>{
+    document.getElementById(id).classList.toggle('active', 
+      (id==='tabLib'&&t==='library')||(id==='tabAI'&&t==='ai')||(id==='tabExport'&&t==='export'));
+  });
+}
+
+function renderStats(){
+  const dax = functions.filter(f=>f.type==='DAX').length;
+  const pq = functions.filter(f=>f.type==='PQ').length;
+  const xl = functions.filter(f=>f.type==='Excel').length;
+  const cats = new Set(functions.map(f=>f.cat)).size;
+  document.getElementById('statsRow').innerHTML =
+    statCard(dax,'DAX Functions','brand')+statCard(pq,'Power Query','accent')+
+    statCard(xl,'Excel Functions','amber')+statCard(cats,'Categories','purple');
+}
+function statCard(n,l,c){
+  return `<div class="stat-card"><div class="stat-num" style="color:var(--${c})">${n}</div><div class="stat-label">${l}</div></div>`;
+}
+
+function renderTypeFilter(){
+  const t = T[lang];
+  const types = [t.allType, t.typeDAX, t.typePQ, t.typeExcel];
+  const vals = ['All','DAX','PQ','Excel'];
+  document.getElementById('typeFilter').innerHTML = types.map((lbl,i)=>
+    `<button class="type-btn${typeFlt===vals[i]?' active':''}" onclick="setType('${vals[i]}')">${lbl}</button>`
+  ).join('');
+}
+function setType(v){ typeFlt=v; renderTypeFilter(); filterFunctions(); }
+
+function renderCatFilter(){
+  const allLabel = T[lang].allCat;
+  const cats = [...new Set(functions.map(f=>f.cat))];
+  document.getElementById('catFilter').innerHTML =
+    [allLabel,...cats].map(c=>`<button class="cat-pill${(catFlt==='All'&&c===allLabel)||catFlt===c?' active':''}" onclick="setCat('${c==='All'?'All':c}')">${c}</button>`).join('');
+}
+function setCat(v){ catFlt=v; renderCatFilter(); filterFunctions(); }
+
+function filterFunctions(){
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  let res = functions.filter(f=>{
+    const typeMatch = typeFlt==='All'||f.type===typeFlt;
+    const catMatch = catFlt==='All'||f.cat===catFlt;
+    const d = f[lang]||f.en;
+    const textMatch = !q||f.name.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q)||f.cat.toLowerCase().includes(q);
+    return typeMatch&&catMatch&&textMatch;
+  });
+  document.getElementById('resultsCount').textContent = lang==='ar'?`${res.length} دالة`:`${res.length} functions`;
+  const grid = document.getElementById('libraryGrid');
+  if(!res.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div>${lang==='ar'?'لا توجد نتائج':'No results found'}</div>`;return;}
+  grid.innerHTML = res.map((f,i)=>renderCard(f,i)).join('');
+}
+
+function renderCard(f,idx){
+  const d = f[lang]||f.en; const t = T[lang];
+  const badgeMap = {DAX:'badge-dax',PQ:'badge-pq',Excel:'badge-excel'};
+  const typeLabel = f.type==='PQ'?'Power Query':f.type;
+  const detail = `
+    <div class="func-detail">
+      <div class="detail-label">${t.detailExample}</div>
+      <div class="code-block"><button class="copy-code" onclick="event.stopPropagation();copyCode(this)">Copy</button>${escHtml(d.example)}</div>
+      ${d.tip?`<div class="detail-label" style="margin-top:10px">${t.detailTip}</div><div class="tip-box">${d.tip}</div>`:''}
+      ${d.note?`<div class="note-row"><span class="note-badge">${t.detailNote}</span><span>${d.note}</span></div>`:''}
+      ${d.compare?`<div class="detail-label" style="margin-top:10px">${t.detailCompare}</div><div class="compare-row"><div class="compare-cell"><div class="compare-title" style="color:var(--accent)">${d.compare.left.label}</div><div class="compare-code">${escHtml(d.compare.left.code)}</div></div><div class="compare-cell"><div class="compare-title" style="color:var(--coral)">${d.compare.right.label}</div><div class="compare-code">${escHtml(d.compare.right.code)}</div></div></div>`:''}
+    </div>`;
+  return `<div class="func-card" id="card-${idx}" onclick="toggleCard(${idx})">
+    <div class="card-top">
+      <div class="card-left">
+        <span class="func-badge ${badgeMap[f.type]||'badge-dax'}">${typeLabel}</span>
+        <div class="card-info">
+          <div class="func-name">${f.name}</div>
+          <div class="func-desc">${d.desc}</div>
+          <div class="card-cat">${f.cat}</div>
+        </div>
+      </div>
+      <div class="expand-icon">▾</div>
+    </div>
+    ${detail}
+  </div>`;
+}
+
+function toggleCard(i){
+  const cur = document.getElementById('card-'+i);
+  if(!cur) return;
+  if(expandedIdx===i){cur.classList.remove('expanded');expandedIdx=null;}
+  else{
+    if(expandedIdx!==null){const p=document.getElementById('card-'+expandedIdx);if(p)p.classList.remove('expanded');}
+    cur.classList.add('expanded');expandedIdx=i;
+    setTimeout(()=>cur.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  }
+}
+
+function copyCode(btn){
+  const block = btn.parentElement;
+  const txt = block.textContent.replace('Copy','').trim();
+  navigator.clipboard.writeText(txt).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500);});
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ─────────────────────── AI CHAT ───────────────────────
+function renderChips(){
+  document.getElementById('chips').innerHTML = (suggestions[lang]||[]).map(c=>
+    `<button class="chip" onclick="useChip(this)">${c}</button>`
+  ).join('');
+}
+function useChip(btn){document.getElementById('chatInput').value=btn.textContent;sendMessage();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function clearChat(){chatHistory=[];document.getElementById('chatArea').innerHTML=`<div class="msg ai" id="welcomeMsg">${T[lang].welcome}</div>`;showToast(lang==='ar'?'تم مسح المحادثة':'Chat cleared');}
+
+async function sendMessage(){
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim(); if(!msg) return;
+  inp.value=''; appendMsg(msg,'user'); chatHistory.push({role:'user',content:msg});
+  const btn = document.getElementById('sendBtn'); btn.disabled=true;
+  const lid = appendLoading();
+  try{
+    const r = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        system:`You are an expert data analyst specializing in DAX (Power BI), Power Query (M language), Excel, and SQL. The user may write in Arabic or English — always respond in the SAME language they used. Provide clean formatted code examples, explain each part, mention Excel/SQL equivalents when helpful. Be concise but complete. Format code with proper indentation.`,
+        messages:chatHistory
+      })
+    });
+    const data = await r.json();
+    const text = data.content?.map(b=>b.text||'').join('')||'Sorry, something went wrong.';
+    removeLoading(lid); chatHistory.push({role:'assistant',content:text}); appendMsg(text,'ai');
+  }catch(e){removeLoading(lid);appendMsg(lang==='ar'?'خطأ في الاتصال. حاول مرة أخرى.':'Connection error. Please try again.','ai');}
+  btn.disabled=false;
+}
+
+function appendMsg(text,role){
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div'); div.className='msg '+role;
+  if(role==='ai') div.innerHTML=formatAI(text); else div.textContent=text;
+  area.appendChild(div); area.scrollTop=area.scrollHeight;
+}
+function formatAI(text){
+  return text.split(/(```[\s\S]*?```)/g).map(p=>{
+    if(p.startsWith('```')){const c=p.replace(/```[a-z]*\n?/,'').replace(/```$/,'');return`<div class="msg-code">${escHtml(c)}</div>`;}
+    return escHtml(p).replace(/\n/g,'<br>');
+  }).join('');
+}
+function appendLoading(){
+  const area=document.getElementById('chatArea'),id='l'+Date.now();
+  const d=document.createElement('div');d.className='msg ai';d.id=id;
+  d.innerHTML='<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  area.appendChild(d);area.scrollTop=area.scrollHeight;return id;
+}
+function removeLoading(id){const e=document.getElementById(id);if(e)e.remove();}
+
+// ─────────────────────── EXPORT ───────────────────────
+function downloadHTML(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='mahmoud_dax_powerquery_tool.html';a.click();
+  showToast(lang==='ar'?'تم التنزيل بنجاح ✓':'Downloaded successfully ✓');
+}
+function copyLink(){
+  navigator.clipboard.writeText(window.location.href).then(()=>showToast(lang==='ar'?'تم نسخ الرابط ✓':'Link copied ✓'));
+}
+function printPage(){window.print();}
+function copyStats(){
+  const dax=functions.filter(f=>f.type==='DAX').length;
+  const pq=functions.filter(f=>f.type==='PQ').length;
+  const xl=functions.filter(f=>f.type==='Excel').length;
+  const txt=lang==='ar'
+    ?`📊 مكتبة DAX & Power Query:\n✅ ${dax} دالة DAX\n✅ ${pq} نمط Power Query\n✅ ${xl} دالة Excel\n✅ مساعد AI مدمج\n✅ ثنائي اللغة`
+    :`📊 DAX & Power Query Library:\n✅ ${dax} DAX functions\n✅ ${pq} Power Query patterns\n✅ ${xl} Excel functions\n✅ Built-in AI assistant\n✅ Bilingual (AR/EN)`;
+  navigator.clipboard.writeText(txt).then(()=>showToast(lang==='ar'?'تم النسخ ✓':'Copied ✓'));
+}
+function showPost(l){
+  postLang=l;
+  document.getElementById('postBtnEn').style.fontWeight=l==='en'?'600':'400';
+  document.getElementById('postBtnAr').style.fontWeight=l==='ar'?'600':'400';
+  document.getElementById('postContent').textContent=posts[l];
+}
+function copyPost(){
+  navigator.clipboard.writeText(posts[postLang]).then(()=>showToast(lang==='ar'?'تم نسخ المنشور ✓':'Post copied ✓'));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+init();
+</script>
+</body>
+</html>
