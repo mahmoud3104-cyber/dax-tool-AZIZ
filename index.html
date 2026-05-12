@@ -855,7 +855,7 @@ async function sendMessage(){
     const r = await fetch("https://lucky-frog-21cc.mahmoud3104.workers.dev/
 ",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json","x-api-key":"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"},
       body:JSON.stringify({
         model:"claude-sonnet-4-20250514",max_tokens:1000,
         system:`You are an expert data analyst specializing in DAX (Power BI), Power Query (M language), Excel, and SQL. The user may write in Arabic or English — always respond in the SAME language they used. Provide clean formatted code examples, explain each part, mention Excel/SQL equivalents when helpful. Be concise but complete. Format code with proper indentation.`,
