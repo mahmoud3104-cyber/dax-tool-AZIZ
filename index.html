@@ -856,7 +856,7 @@ async function sendMessage(){
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        model:"claude-sonnet-4-5",max_tokens:1000,
         system:`You are an expert data analyst specializing in DAX (Power BI), Power Query (M language), Excel, and SQL. The user may write in Arabic or English — always respond in the SAME language they used. Provide clean formatted code examples, explain each part, mention Excel/SQL equivalents when helpful. Be concise but complete. Format code with proper indentation.`,
         messages:chatHistory
       })
