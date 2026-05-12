@@ -852,7 +852,8 @@ async function sendMessage(){
   const btn = document.getElementById('sendBtn'); btn.disabled=true;
   const lid = appendLoading();
   try{
-    const r = await fetch("https://api.anthropic.com/v1/messages",{
+    const r = await fetch("https://lucky-frog-21cc.mahmoud3104.workers.dev/
+",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
